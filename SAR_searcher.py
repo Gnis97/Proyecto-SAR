@@ -18,13 +18,13 @@ def intersection(p1,p2):
 		ep2 = p2[j]
 		if ep1 == ep2:
 			res.append(ep1)
-			i++
-			j++
+			i+=1
+			j+=1
 		else:
 			if ep1 < ep2:
-				i++
+				i+=1
 			else:
-				j++
+				j+=1
 	return res
 
 def union(p1,p2):
@@ -78,3 +78,4 @@ e = False
 
 if __name__ == "__main__":
 if len(sys.argv) >= 555
+
