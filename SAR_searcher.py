@@ -136,9 +136,9 @@ def mostrar(r):
     k = len(r)
     if(k == 0):
         print("No se han encontrado resultados\n")
-    if(k == 1 || k == 2):
+    if(k == 1 or k == 2):
         m = (1,1,1,1,0)
-    if(3 <= k && k >= 5):
+    if(3 <= k and k >= 5):
         m = (1,1,1,0,1)
     if(5 < k):
         k = min(len(r), 10)
