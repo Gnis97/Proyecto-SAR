@@ -108,7 +108,7 @@ def union(p1,p2):
 			res.append(ep1)
 			i+=1
 			j+=1
-		else: 
+		else:
 			if ep1 < ep2:
 				res.append(ep1)
 				i+=1
@@ -122,7 +122,7 @@ def union(p1,p2):
 		ep2 = p2[j]
 		res.append(ep2)
 	return  res
-	
+
 def diferencia(dic,p2):
 	res = []
 	for k,v in dic:
@@ -141,7 +141,7 @@ if __name__ == "__main__":
             querry = sys.argv[2]
         if querry != None:
             resultado = consulta(findi, querry)
-            print resultado
+            mostrar(resultado)
         else:
             while True:
                 text = input("Dime:")
@@ -149,4 +149,4 @@ if __name__ == "__main__":
                     break
                 querry = text
                 resultado = consulta(findi, querry)
-                print resultado
+                mostrar(resultado)
