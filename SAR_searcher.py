@@ -20,6 +20,8 @@ import sys
 import json
 import pickle
 
+termsnip = []
+
 def load_object(file_name):
     with open (file_name, 'rb') as fh:
         obj = pickle.load(fh)
@@ -30,27 +32,46 @@ def load_json(filename):
         obj = json.load(fh)
     return obj
 
-def parsequerry(que):
-    que.lower()
+def gensnippet(ar):
+    listindi = [] #Lista donde se guardan los indices de los terminos de la querry
+    ressnip = ""
+    ar = ar.lower()
+    ar = ar.split()# Separamos el articulo en una lista de plabras
+    for t in termsnip:# Para cada termino de la querry obtenermos su primer indice en el articulo
+        listindi.append(ar.index(t))
+    listindi.sort()
+    for x in listindi:# Creamos el snippet obteniendo pedazos de texto de longitud 9 teniendo los terminos en el medio
+        inn = max((listindi-4),0)# Evitamos salirnos del array
+        fi = min((listindi+4),len(ar))# Evitamos salirnos del array
+        ressnip = ressnip + " " +"..." + " ".join(ar[inn:fi] + "...")
+    return ressnip
+
+def parsequerry(que):#Pasamos a minuscula y semaparamos la querry
+    que = que.lower()
     que = que.split()
     return que
-
-def consulta(in, q):
+"""
+Se recorrera la querry detectando los operadores booleanos y realizando las
+operaciones interseccion, union y diferencia requeridas.
+1 = and, 2 = or, 3 = not, 10 = and not, 20 = or not
+"""
+def consulta(ind, q):
     operador = -1
-    res = None
-    in = load_object(in)
+    res = []
+    ind = load_object(ind)#necesitara correccion
     q = parsequerry(q)
-    for t in q:
-        if res == None:
-            res = in[t]
+    for t in q:# Recorrremos la querry
+        if len(res) == 0 and not t == "not":
+            res = ind[t]
+            termsnip.append(ind[t])
         else:
-            if t == "AND":
+            if t == "and":
                 operador = 1
                 break
-            if t == "OR":
+            if t == "or":
                 operador = 2
                 break
-            if t == "NOT":
+            if t == "not":
                 if operador > 0:
                     operador = operador*10
                 else:
@@ -58,19 +79,21 @@ def consulta(in, q):
                 break
 
             if operador == 1:
-                aux = in[t]
+                aux = ind[t]
+                termsnip.append(ind[t])
                 res = intersection(res, aux)
             if operador == 2:
-                aux = in[t]
+                aux = ind[t]
+                termsnip.append(ind[t])
                 res = union(res, aux)
             if operador == 3:
-                aux = in[t]
-                res = diferencia(in, in[t])
+                aux = ind[t]
+                res = diferencia(ind, aux)
             if operador == 10:
-                aux = diferencia(in, in[t])
+                aux = diferencia(ind, ind[t])
                 res = intersection(res, aux)
             if operador == 20:
-                aux = diferencia(in, in[t])
+                aux = diferencia(ind, ind[t])
                 res = union(res, aux)
             operador = -1
     return res
@@ -143,7 +166,7 @@ def mostrar(r):
     if(5 < k):
         k = min(len(r), 10)
         m = (1,1,1,0,0)
-    for k:#falta obtenere los objetos
+    for k:#falta obtener los objetos
         p = ""
         if m[0]:
             p = p + r[k]["date"] + " "
@@ -154,7 +177,7 @@ def mostrar(r):
         if m[3]:
             p = p + r[k]["article"] + " "
         if m[4]:
-            p = p + gensnippet(r[k]) + " "
+            p = p + gensnippet(r[k]["article"]) + " "
         print(p)
     print("Numero de resultados: ", len(r))
 
