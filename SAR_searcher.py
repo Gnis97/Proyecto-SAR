@@ -166,28 +166,30 @@ def mostrar(r):
     if(5 < k):
         k = min(len(r), 10)
         m = (1,1,1,0,0)
-    for k:#falta obtener los objetos
+    c = 0
+    while c < k:#falta obtener los objetos
         p = ""
         if m[0]:
-            p = p + r[k]["date"] + " "
+            p = p + r[c]["date"] + " "
         if m[1]:
-            p = p + r[k]["title"] + " "
+            p = p + r[c]["title"] + " "
         if m[2]:
-            p = p + r[k]["keywors"] + " "
+            p = p + r[c]["keywors"] + " "
         if m[3]:
-            p = p + r[k]["article"] + " "
+            p = p + r[c]["article"] + " "
         if m[4]:
-            p = p + gensnippet(r[k]["article"]) + " "
+            p = p + gensnippet(r[c]["article"]) + " "
         print(p)
+        c = c+1
     print("Numero de resultados: ", len(r))
 
 if __name__ == "__main__":
     querry = None
     resultado = None
     if len(sys.argv) >= 2:
-        findi = sys.argv[1]
+        findi = sys.argv[1] #indice
         if len(sys.argv) >= 3:
-            querry = sys.argv[2]
+            querry = sys.argv[2] #querry
         if querry != None:
             resultado = consulta(findi, querry)
             mostrar(resultado)
