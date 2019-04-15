@@ -58,44 +58,45 @@ operaciones interseccion, union y diferencia requeridas.
 def consulta(ind, q):
     operador = -1
     res = []
-    ind = load_object(ind)#necesitara correccion
+    inda = ind[1]
+    indt = ind[2]
     q = parsequerry(q)
     for t in q:# Recorrremos la querry
         if len(res) == 0 and not t == "not":
-            res = ind[t]
-            termsnip.append(ind[t])
+            res = indt[t]
+            termsnip.append(indt[t])
         else:
-            if t == "and": #es una and
-                operador = 1
-                break
-            if t == "or":
-                operador = 2
-                break
-            if t == "not":
-                if operador > 0:
-                    operador = operador*10
-                else:
-                    operador = 3
-                break
-
-            if operador == 1:
-                aux = ind[t]
-                termsnip.append(ind[t])
-                res = intersection(res, aux)
-            if operador == 2:
-                aux = ind[t]
-                termsnip.append(ind[t])
-                res = union(res, aux)
-            if operador == 3:
-                aux = ind[t]
-                res = diferencia(ind, aux)
-            if operador == 10:
-                aux = diferencia(ind, ind[t])
-                res = intersection(res, aux)
-            if operador == 20:
-                aux = diferencia(ind, ind[t])
-                res = union(res, aux)
-            operador = -1
+            if(t == "and" or t == "or" or t == "not"):
+                if t == "and": #es una and
+                    print("HE ENCONTRADO UN AND")
+                    operador = 1
+                if t == "or":
+                    operador = 2
+                if t == "not":
+                    if operador > 0:
+                        operador = operador*10
+                    else:
+                        operador = 3
+            else:
+                if operador == 1:
+                    print("HE APLICADO UN AND")
+                    aux = indt[t]
+                    termsnip.append(indt[t])
+                    res = intersection(res, aux)
+                if operador == 2:
+                    aux = indt[t]
+                    termsnip.append(indt[t])
+                    res = union(res, aux)
+                if operador == 3:
+                    aux = indt[t]
+                    res = diferencia(indt, aux)
+                if operador == 10:
+                    aux = diferencia(inda, indt[t])
+                    res = intersection(res, aux)
+                if operador == 20:
+                    aux = diferencia(inda, indt[t])
+                    res = union(res, aux)
+                operador = -1
     return res
 
 def intersection(p1,p2):
@@ -148,13 +149,14 @@ def union(p1,p2):
 
 def diferencia(dic,p2):
     res = []
-    for k,v in dic:
-        for e in v:
-            if e not in p2:
-                res.append(e)
+    for k,_ in dic.items():
+        if k not in p2:
+                res.append(k)
     return res
 
-def mostrar(r):
+def mostrar(r, ind):
+    dicDoc = ind[0]
+    dicArt = ind[1]
     m = (0,0,0,0,0) #{fecha, titulo ,keywords, cuerpo, snippet}
     k = len(r)
     if(k == 0):
@@ -167,18 +169,23 @@ def mostrar(r):
         k = min(len(r), 10)
         m = (1,1,1,0,0)
     c = 0
+    print("Numero de resultados: ", len(r))
     while c < k:#falta obtener los objetos
+        ndoc,posdoc = dicArt[r[c]]
+        with open(dicDoc[ndoc]) as json_file:
+            ob = json.load(json_file)
+        arti = ob[posdoc]
         p = ""
         if m[0]:
-            p = p + r[c]["date"] + " "
+            p = p + arti["date"] + " "
         if m[1]:
-            p = p + r[c]["title"] + " "
+            p = p + arti["title"] + " "
         if m[2]:
-            p = p + r[c]["keywors"] + " "
+            p = p + arti["keywords"] + " "
         if m[3]:
-            p = p + r[c]["article"] + " "
+            p = p + arti["article"] + " "
         if m[4]:
-            p = p + gensnippet(r[c]["article"]) + " "
+            p = p + gensnippet(arti["article"]) + " "
         print(p)
         c = c+1
     print("Numero de resultados: ", len(r))
@@ -188,11 +195,12 @@ if __name__ == "__main__":
     resultado = None
     if len(sys.argv) >= 2:
         findi = sys.argv[1] #indice
+        findi = load_object(findi)#(diccionario de documentos, diccionario de articulos, diccionario de terminos)
         if len(sys.argv) >= 3:
             querry = sys.argv[2] #querry
         if querry != None:
             resultado = consulta(findi, querry)
-            mostrar(resultado)
+            mostrar(resultado, findi)
         else:
             while True:
                 text = input("Dime:")
@@ -200,4 +208,4 @@ if __name__ == "__main__":
                     break
                 querry = text
                 resultado = consulta(findi, querry)
-                mostrar(resultado)
+                mostrar(resultado, findi)

@@ -12,13 +12,13 @@ import os
 def save_object(object, file_name):
     with open(file_name, 'wb') as fh:
         pickle.dump(object, fh)
-        
+
 clean_re = re.compile('\W+')
 
 def clean_text(text):
     return clean_re.sub(' ', text)
-    
-    
+
+
 
 def indexer(folder,fitxerGuardat):
 
@@ -35,7 +35,7 @@ def indexer(folder,fitxerGuardat):
             for noti in ob:
                 tupla = [len(dDocs),pos]
                 pos +=1
-                
+
                 dArticles[len(dArticles)] = tupla
                 text = noti["article"]
                 text = text.lower()
@@ -43,7 +43,7 @@ def indexer(folder,fitxerGuardat):
                 text = text.replace("\n"," ")
                 text = text.replace("\t"," ")
                 text = text.split()
-            
+
                 for simb in text:
                     #if simb in lletres or simb in nums:
                     postingListTerms[simb] = postingListTerms.get(simb,[])
@@ -56,9 +56,17 @@ def indexer(folder,fitxerGuardat):
                             postingListTerms[simb] = postingListTerms.get(simb) + [len(dArticles)]
     objecte = [dDocs, dArticles, postingListTerms]
     save_object(objecte, fitxerGuardat)
-    
-    
-    
+
+    print(postingListTerms)
+
+
+    print(dArticles)
+
+
+    print(dDocs)
+
+
+
 '''El fichero invertido puede ser una tabla hash implementada como un diccionario de
     python, indexado por término y que haga referencia a una lista con los newid
     asociados a ese término.'''
@@ -81,4 +89,3 @@ if __name__ == "__main__":
         indexer(colNot, savIndx)
     else:
         syntax()
-        
