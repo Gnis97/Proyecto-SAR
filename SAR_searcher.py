@@ -65,7 +65,7 @@ def consulta(ind, q):
             res = ind[t]
             termsnip.append(ind[t])
         else:
-            if t == "and":
+            if t == "and": #es una and
                 operador = 1
                 break
             if t == "or":
