@@ -15,12 +15,18 @@ Requesitos:
     PREPARADO total de notiias.
 
 """
-
+import re
 import sys
 import json
 import pickle
 
 termsnip = []
+
+
+clean_re = re.compile('\W+')
+
+def clean_text(text):
+    return clean_re.sub(' ', text)
 
 def load_object(file_name):
     with open (file_name, 'rb') as fh:
@@ -36,14 +42,17 @@ def gensnippet(ar):
     listindi = [] #Lista donde se guardan los indices de los terminos de la querry
     ressnip = ""
     ar = ar.lower()
+    ar = clean_text(ar)
+    ar = ar.replace("\n"," ")
+    ar = ar.replace("\t"," ")
     ar = ar.split()# Separamos el articulo en una lista de plabras
     for t in termsnip:# Para cada termino de la querry obtenermos su primer indice en el articulo
         listindi.append(ar.index(t))
     listindi.sort()
     for x in listindi:# Creamos el snippet obteniendo pedazos de texto de longitud 9 teniendo los terminos en el medio
-        inn = max((listindi-4),0)# Evitamos salirnos del array
-        fi = min((listindi+4),len(ar))# Evitamos salirnos del array
-        ressnip = ressnip + " " +"..." + " ".join(ar[inn:fi] + "...")
+        inn = max((x-4),0)# Evitamos salirnos del array
+        fi = min((x+5),len(ar))# Evitamos salirnos del array
+        ressnip = ressnip + " " + "..." + " ".join(ar[inn:fi]) + "..."
     return ressnip
 
 def parsequerry(que):#Pasamos a minuscula y semaparamos la querry
@@ -62,39 +71,55 @@ def consulta(ind, q):
     indt = ind[2]
     q = parsequerry(q)
     for t in q:# Recorrremos la querry
-        if len(res) == 0 and not t == "not":
-            res = indt[t]
-            termsnip.append(indt[t])
+        print("TERMINO: ", t)
+        if len(res) == 0 and not t == "not" and not t == "and" and not t == "or" and operador == -1:
+            print("PRIMER TERMINO")
+            aux = indt.get(t,None)
+            if aux is not None:
+                res += aux
+                termsnip.append(t)
         else:
             if(t == "and" or t == "or" or t == "not"):
                 if t == "and": #es una and
                     print("HE ENCONTRADO UN AND")
                     operador = 1
                 if t == "or":
+                    print("HE ENCONTRADO UN OR")
                     operador = 2
                 if t == "not":
+                    print("HE ENCONTRADO UN NOT")
                     if operador > 0:
+                        print("NOT DOBLE")
                         operador = operador*10
                     else:
+                        print("NOT SIMPLE")
                         operador = 3
             else:
                 if operador == 1:
                     print("HE APLICADO UN AND")
-                    aux = indt[t]
-                    termsnip.append(indt[t])
+                    aux = indt.get(t,[])
+                    if aux is not []:
+                        termsnip.append(t)
                     res = intersection(res, aux)
                 if operador == 2:
-                    aux = indt[t]
-                    termsnip.append(indt[t])
+                    print("HE APLICADO UN OR")
+                    aux = indt.get(t,[])
+                    if aux is not []:
+                        termsnip.append(t)
                     res = union(res, aux)
                 if operador == 3:
-                    aux = indt[t]
-                    res = diferencia(indt, aux)
+                    print("HE APLICADO UN NOT")
+                    aux = indt.get(t,[])
+                    res = diferencia(inda, aux)
                 if operador == 10:
-                    aux = diferencia(inda, indt[t])
+                    print("HE APLICADO UN AND NOT")
+                    aux = indt.get(t,[])
+                    aux = diferencia(inda, aux)
                     res = intersection(res, aux)
                 if operador == 20:
-                    aux = diferencia(inda, indt[t])
+                    print("HE APLICADO UN OR NOT")
+                    aux = indt.get(t,[])
+                    aux = diferencia(inda, aux)
                     res = union(res, aux)
                 operador = -1
     return res
@@ -142,9 +167,11 @@ def union(p1,p2):
     while i < len(p1):
         ep1 = p1[i]
         res.append(ep1)
-    while j < len(ep2):
+        i+=1
+    while j < len(p2):
         ep2 = p2[j]
         res.append(ep2)
+        j+=1
     return  res
 
 def diferencia(dic,p2):
@@ -163,7 +190,7 @@ def mostrar(r, ind):
         print("No se han encontrado resultados\n")
     if(k == 1 or k == 2):
         m = (1,1,1,1,0)
-    if(3 <= k and k >= 5):
+    if(3 <= k and k <= 5):
         m = (1,1,1,0,1)
     if(5 < k):
         k = min(len(r), 10)

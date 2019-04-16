@@ -22,9 +22,9 @@ def clean_text(text):
 
 def indexer(folder,fitxerGuardat):
 
-    dDocs = {}
-    dArticles = {}
-    postingListTerms = {} #cada termino: lista de id de las noticias en que aparece
+    dDocs = {}# Diccionario de documentos (k indice, v path)
+    dArticles = {} # Diccionario de articulos(k indice del articulo, v (num documento, posicion dentro del documentos))
+    postingListTerms = {} # Diccionario de Terminos (k Termino, v lista de articulos que aparece)
     for dirname, subdirs, files in os.walk(folder): #"paseja" per la carpeta
         for filename in files: #agafa els fitxers
             wholeName = os.path.join(dirname,filename)
@@ -32,38 +32,37 @@ def indexer(folder,fitxerGuardat):
                 ob = json.load(json_file)#carrega el fitxer
             dDocs[len(dDocs)] = wholeName #afig el fitxer al diccionari de fitxers
             pos = 0
-            for noti in ob:
-                tupla = [len(dDocs),pos]
+            for noti in ob:#para cada noticia dentro del objeto
+                tupla = [len(dDocs)-1,pos]#creas la tupla de el articulo
                 pos +=1
 
-                dArticles[len(dArticles)] = tupla
-                text = noti["article"]
+                dArticles[len(dArticles)] = tupla #insertamos la tupla en el diccionario
+                text = noti["article"] # normalizamos el articulo
                 text = text.lower()
                 text = clean_text(text)
                 text = text.replace("\n"," ")
                 text = text.replace("\t"," ")
                 text = text.split()
 
-                for simb in text:
-                    #if simb in lletres or simb in nums:
-                    postingListTerms[simb] = postingListTerms.get(simb,[])
-                    if postingListTerms[simb] == [] :
-                        postingListTerms[simb] = [len(dArticles)]
+                for simb in text: #para cada temino en el texto
+                    postingListTerms[simb] = postingListTerms.get(simb,[])# recuperas el termino
+                    if postingListTerms[simb] == [] : # si recuperas nada
+                        postingListTerms[simb] = [len(dArticles)-1]
                     else :
                         var = len(postingListTerms[simb])
                         lista = postingListTerms[simb]
-                        if len(dArticles) > lista[var-1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
-                            postingListTerms[simb] = postingListTerms.get(simb) + [len(dArticles)]
+                        if len(dArticles)-1 > lista[var-1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
+                            postingListTerms[simb] = postingListTerms.get(simb) + [len(dArticles)-1]
     objecte = [dDocs, dArticles, postingListTerms]
     save_object(objecte, fitxerGuardat)
 
-    print(postingListTerms)
+    #print(postingListTerms)
 
 
     print(dArticles)
 
 
-    print(dDocs)
+    #print(dDocs)
 
 
 
