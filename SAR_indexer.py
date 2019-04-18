@@ -25,6 +25,10 @@ def indexer(folder,fitxerGuardat):
     dDocs = {}# Diccionario de documentos (k indice, v path)
     dArticles = {} # Diccionario de articulos(k indice del articulo, v (num documento, posicion dentro del documentos))
     postingListTerms = {} # Diccionario de Terminos (k Termino, v lista de articulos que aparece)
+    postingListTitle = {} # diccionario inverso de las palabras de los titulos
+    postingListSummary = {} # Diccionario inverso de las palabras del sumario
+    postingListKeywords = {} # Diccionario inverso de palabras clave
+    postingListDate = {} # Diccionario inverso de fechas
     for dirname, subdirs, files in os.walk(folder): #"paseja" per la carpeta
         for filename in files: #agafa els fitxers
             wholeName = os.path.join(dirname,filename)
@@ -37,13 +41,42 @@ def indexer(folder,fitxerGuardat):
                 pos +=1
 
                 dArticles[len(dArticles)] = tupla #insertamos la tupla en el diccionario
-                text = noti["article"] # normalizamos el articulo
+
+                 #seleccion de las secciones a indexar
+                text = noti["article"]
+                title = noti["title"]
+                summary = noti["summary"]
+                keywords = noti["keywords"]
+                date = noti["date"]
+
+                #paso a minuscula
                 text = text.lower()
+                title = title.lower()
+                summmary = summary.lower()
+                keywords = keywords.lower()
+
+                #eliminación de caracteres no alfanumericos
                 text = clean_text(text)
+                title = clean_text(title)
+
+
+                #eliminación de saltos de linea y tabuladores
                 text = text.replace("\n"," ")
                 text = text.replace("\t"," ")
-                text = text.split()
+                title = title.replace("\n"," ")
+                title = title.replace("\t"," ")
+                summary = summary.replace("\n"," ")
+                summary = summary.replace("\t"," ")
+                keywords = keywords.replace("\n"," ")
+                keywords = keywords.replace("\t"," ")
 
+                #separación del texto
+                text = text.split()
+                title = title.split()
+                summary = summary.split()
+                keywords = keywords.split(",")
+
+                #inserción en cada diccionario inverso el contenido a indexar
                 for simb in text: #para cada temino en el texto
                     postingListTerms[simb] = postingListTerms.get(simb,[])# recuperas el termino
                     if postingListTerms[simb] == [] : # si recuperas nada
@@ -53,13 +86,56 @@ def indexer(folder,fitxerGuardat):
                         lista = postingListTerms[simb]
                         if len(dArticles)-1 > lista[var-1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
                             postingListTerms[simb] = postingListTerms.get(simb) + [len(dArticles)-1]
-    objecte = [dDocs, dArticles, postingListTerms]
+
+
+                for simb in title: #para cada temino en el texto
+                    postingListTitle[simb] = postingListTitle.get(simb,[])# recuperas el termino
+                    if postingListTitle[simb] == [] : # si recuperas nada
+                        postingListTitle[simb] = [len(dArticles)-1]
+                    else :
+                        var = len(postingListTitle[simb])
+                        lista = postingListTitle[simb]
+                        if len(dArticles)-1 > lista[var-1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
+                            postingListTitle[simb] = postingListTitle.get(simb) + [len(dArticles)-1]
+
+
+                for simb in summary: #para cada temino en el texto
+                    postingListSummary[simb] = postingListSummary.get(simb,[])# recuperas el termino
+                    if postingListSummary[simb] == [] : # si recuperas nada
+                        postingListSummary[simb] = [len(dArticles)-1]
+                    else :
+                        var = len(postingListSummary[simb])
+                        lista = postingListSummary[simb]
+                        if len(dArticles)-1 > lista[var-1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
+                            postingListSummary[simb] = postingListSummary.get(simb) + [len(dArticles)-1]
+
+
+                for simb in keywords: #para cada temino en el texto
+                    postingListKeywords[simb] = postingListKeywords.get(simb,[])# recuperas el termino
+                    if postingListKeywords[simb] == [] : # si recuperas nada
+                        postingListKeywords[simb] = [len(dArticles)-1]
+                    else :
+                        var = len(postingListKeywords[simb])
+                        lista = postingListKeywords[simb]
+                        if len(dArticles)-1 > lista[var-1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
+                            postingListKeywords[simb] = postingListKeywords.get(simb) + [len(dArticles)-1]
+
+                postingListDate[date] = postingListDate.get(simb,[])# recuperas el termino
+                if postingListDate[date] == [] : # si recuperas nada
+                    postingListDate[date] = [len(dArticles)-1]
+                else :
+                    var = len(postingListDate[date])
+                    lista = postingListDate[date]
+                    if len(dArticles)-1 > lista[var-1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
+                        postingListDate[date] = postingListDate.get(date) + [len(dArticles)-1]
+
+
+        #creación del objeto y grardado del mismo.
+    objecte = [dDocs, dArticles, postingListTerms, postingListTitle, postingListSummary,postingListKeywords,postingListDate]
     save_object(objecte, fitxerGuardat)
 
-    #print(postingListTerms)
+    print(postingListDate)
 
-
-    print(dArticles)
 
 
     #print(dDocs)
