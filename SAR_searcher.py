@@ -21,7 +21,9 @@ import json
 import pickle
 
 termsnip = []
-
+conparent = []
+numparent = 0
+findi = None
 
 clean_re = re.compile('\W+')
 
@@ -60,6 +62,24 @@ def parsequerry(que):#Pasamos a minuscula y semaparamos la querry
     que = que.split()
     return que
 
+def parentesis(quensulta):
+    primer = -1
+    ulti = -1
+    cont = 0
+    while cont < len(quensulta) and ulti == -1:
+        if (quensulta[cont] == "("):
+            primer = cont
+        if (quensulta[cont] == ")"):
+            ulti = cont
+        cont += 1
+    if primer == -1:
+        return quensulta, 1
+    nuevaq = quensulta[primer+1:ulti]
+    cambio = "rexultadio" + str(len(conparent))
+    conparent.append(consulta(findi, nuevaq))
+    quensulta = quensulta.replace(quensulta[primer:ulti+1], cambio)
+    return quensulta, 0
+
 def procesarTermino(tt):
     if "article:" in tt:
         return tt.replace("article:",""), 2
@@ -78,24 +98,27 @@ operaciones interseccion, union y diferencia requeridas.
 1 = and, 2 = or, 3 = not, 10 = and not, 20 = or not
 """
 def consulta(ind, q):
+    aux = None
+    flag = 0
+    while flag == 0:
+        q,flag = parentesis(q)
     operador = -1
     res = []
     inda = ind[1]
-    indt = ind[2]
-    indT = ind[3]
-    inds = ind[4]
-    indk = ind[5]
-    indd = ind[6]
     q = parsequerry(q)
     for t in q:# Recorrremos la querry
         print("TERMINO: ", t)
         t,lugbus = procesarTermino(t) # te devuelve el termino limpio y el diccionario en el que tienes que bucar
         if len(res) == 0 and not t == "not" and not t == "and" and not t == "or" and operador == -1:
             print("PRIMER TERMINO")
-            aux = ind[lugbus].get(t,[]) #************************************************
+            if "rexultadio" in t:
+                aux = conparent[int(t.replace("rexultadio",""))]
+            else:
+                aux = ind[lugbus].get(t,[]) #************************************************
             if aux is not []:
                 res += aux
-                termsnip.append(t)
+                if "rexultadio" not in t:
+                    termsnip.append(t)
         else:
             if(t == "and" or t == "or" or t == "not"):
                 if t == "and": #es una and
@@ -115,28 +138,43 @@ def consulta(ind, q):
             else:
                 if operador == 1:
                     print("HE APLICADO UN AND")
-                    aux = ind[lugbus].get(t,[]) #*******************************************************************
+                    if "rexultadio" in t:
+                        aux = conparent[int(t.replace("rexultadio",""))]
+                    else:
+                        aux = ind[lugbus].get(t,[]) #*******************************************************************
                     if aux is not []:
                         termsnip.append(t)
                     res = intersection(res, aux)
                 if operador == 2:
                     print("HE APLICADO UN OR")
-                    aux = ind[lugbus].get(t,[]) #********************************************************************
+                    if "rexultadio" in t:
+                        aux = conparent[int(t.replace("rexultadio",""))]
+                    else:
+                        aux = ind[lugbus].get(t,[]) #********************************************************************
                     if aux is not []:
                         termsnip.append(t)
                     res = union(res, aux)
                 if operador == 3:
                     print("HE APLICADO UN NOT")
-                    aux = ind[lugbus].get(t,[]) #*********************************************************************
+                    if "rexultadio" in t:
+                        aux = conparent[int(t.replace("rexultadio",""))]
+                    else:
+                        aux = ind[lugbus].get(t,[]) #*********************************************************************
                     res = diferencia(inda, aux)
                 if operador == 10:
                     print("HE APLICADO UN AND NOT")
-                    aux = ind[lugbus].get(t,[]) #*********************************************************************
+                    if "rexultadio" in t:
+                        aux = conparent[int(t.replace("rexultadio",""))]
+                    else:
+                        aux = ind[lugbus].get(t,[]) #*********************************************************************
                     aux = diferencia(inda, aux)
                     res = intersection(res, aux)
                 if operador == 20:
                     print("HE APLICADO UN OR NOT")
-                    aux = ind[lugbus].get(t,[]) #**********************************************************************
+                    if "rexultadio" in t:
+                        aux = conparent[int(t.replace("rexultadio",""))]
+                    else:
+                        aux = ind[lugbus].get(t,[]) #**********************************************************************
                     aux = diferencia(inda, aux)
                     res = union(res, aux)
                 operador = -1
@@ -230,7 +268,8 @@ def mostrar(r, ind):
         if m[3]:
             p = p + arti["article"] + " "
         if m[4]:
-            p = p + gensnippet(arti["article"]) + " "
+            p = p
+            #p = p + gensnippet(arti["article"]) + " "
         print(p)
         c = c+1
     print("Numero de resultados: ", len(r))
