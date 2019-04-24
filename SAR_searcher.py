@@ -59,6 +59,19 @@ def parsequerry(que):#Pasamos a minuscula y semaparamos la querry
     que = que.lower()
     que = que.split()
     return que
+
+def procesarTermino(tt):
+    if "article:" in tt:
+        return tt.replace("article:",""), 2
+    if "title:" in tt:
+        return tt.replace("title:",""), 3
+    if "summary:" in tt:
+        return tt.replace("summary:",""), 4
+    if "keywords:" in tt:
+        return tt.replace("keywords:",""), 5
+    if "date:" in tt:
+        return tt.replace("date:",""), 6
+    return tt, 2
 """
 Se recorrera la querry detectando los operadores booleanos y realizando las
 operaciones interseccion, union y diferencia requeridas.
@@ -69,13 +82,18 @@ def consulta(ind, q):
     res = []
     inda = ind[1]
     indt = ind[2]
+    indT = ind[3]
+    inds = ind[4]
+    indk = ind[5]
+    indd = ind[6]
     q = parsequerry(q)
     for t in q:# Recorrremos la querry
         print("TERMINO: ", t)
+        t,lugbus = procesarTermino(t) # te devuelve el termino limpio y el diccionario en el que tienes que bucar
         if len(res) == 0 and not t == "not" and not t == "and" and not t == "or" and operador == -1:
             print("PRIMER TERMINO")
-            aux = indt.get(t,None)
-            if aux is not None:
+            aux = ind[lugbus].get(t,[]) #************************************************
+            if aux is not []:
                 res += aux
                 termsnip.append(t)
         else:
@@ -97,28 +115,28 @@ def consulta(ind, q):
             else:
                 if operador == 1:
                     print("HE APLICADO UN AND")
-                    aux = indt.get(t,[])
+                    aux = ind[lugbus].get(t,[]) #*******************************************************************
                     if aux is not []:
                         termsnip.append(t)
                     res = intersection(res, aux)
                 if operador == 2:
                     print("HE APLICADO UN OR")
-                    aux = indt.get(t,[])
+                    aux = ind[lugbus].get(t,[]) #********************************************************************
                     if aux is not []:
                         termsnip.append(t)
                     res = union(res, aux)
                 if operador == 3:
                     print("HE APLICADO UN NOT")
-                    aux = indt.get(t,[])
+                    aux = ind[lugbus].get(t,[]) #*********************************************************************
                     res = diferencia(inda, aux)
                 if operador == 10:
                     print("HE APLICADO UN AND NOT")
-                    aux = indt.get(t,[])
+                    aux = ind[lugbus].get(t,[]) #*********************************************************************
                     aux = diferencia(inda, aux)
                     res = intersection(res, aux)
                 if operador == 20:
                     print("HE APLICADO UN OR NOT")
-                    aux = indt.get(t,[])
+                    aux = ind[lugbus].get(t,[]) #**********************************************************************
                     aux = diferencia(inda, aux)
                     res = union(res, aux)
                 operador = -1
