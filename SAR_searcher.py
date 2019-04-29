@@ -60,6 +60,21 @@ def gensnippet(ar):
 def parsequerry(que):#Pasamos a minuscula y semaparamos la querry
     que = que.lower()
     que = que.split()
+    auxque = []
+    inn = -1
+    cun = 0
+    for e in que:
+        if '"' in e:
+            if inn == -1:
+                inn = cun
+            else:
+                auxque.append(" ".join(que[inn:cun+1]))
+                inn = -1
+        else:
+            if inn == -1:
+                auxque.append(e)
+        cun += 1
+    que = auxque
     return que
 
 def parentesis(quensulta):
@@ -79,6 +94,25 @@ def parentesis(quensulta):
     conparent.append(consulta(findi, nuevaq))
     quensulta = quensulta.replace(quensulta[primer:ulti+1], cambio)
     return quensulta, 0
+
+def posicional(ttt):
+    ttt = ttt.replace('"', "")
+    ttta = ttt.replace(" ", " and ")
+    rrr = consulta(findi, ttta)
+    k = len(rrr)
+    dicDoc = findi[0]
+    dicArt = findi[1]
+    c = 0
+    resulteido = []
+    while c < k:#falta obtener los objetos
+        ndoc,posdoc = dicArt[rrr[c]]
+        with open(dicDoc[ndoc]) as json_file:
+            ob = json.load(json_file)
+        arti = ob[posdoc]
+        if ttt in arti["article"]:
+            resulteido.append(rrr[c])
+        c += 1
+    return resulteido
 
 def procesarTermino(tt):
     if "article:" in tt:
@@ -113,6 +147,8 @@ def consulta(ind, q):
             print("PRIMER TERMINO")
             if "rexultadio" in t:
                 aux = conparent[int(t.replace("rexultadio",""))]
+            elif '"' in t:
+                aux = posicional(t)
             else:
                 aux = ind[lugbus].get(t,[]) #************************************************
             if aux is not []:
@@ -140,6 +176,8 @@ def consulta(ind, q):
                     print("HE APLICADO UN AND")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
+                    elif '"' in t:
+                        aux = posicional(t)
                     else:
                         aux = ind[lugbus].get(t,[]) #*******************************************************************
                     if aux is not []:
@@ -149,6 +187,8 @@ def consulta(ind, q):
                     print("HE APLICADO UN OR")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
+                    elif '"' in t:
+                        aux = posicional(t)
                     else:
                         aux = ind[lugbus].get(t,[]) #********************************************************************
                     if aux is not []:
@@ -158,6 +198,8 @@ def consulta(ind, q):
                     print("HE APLICADO UN NOT")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
+                    elif '"' in t:
+                        aux = posicional(t)
                     else:
                         aux = ind[lugbus].get(t,[]) #*********************************************************************
                     res = diferencia(inda, aux)
@@ -165,6 +207,8 @@ def consulta(ind, q):
                     print("HE APLICADO UN AND NOT")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
+                    elif '"' in t:
+                        aux = posicional(t)
                     else:
                         aux = ind[lugbus].get(t,[]) #*********************************************************************
                     aux = diferencia(inda, aux)
@@ -173,6 +217,8 @@ def consulta(ind, q):
                     print("HE APLICADO UN OR NOT")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
+                    elif '"' in t:
+                        aux = posicional(t)
                     else:
                         aux = ind[lugbus].get(t,[]) #**********************************************************************
                     aux = diferencia(inda, aux)
@@ -283,13 +329,19 @@ if __name__ == "__main__":
         if len(sys.argv) >= 3:
             querry = sys.argv[2] #querry
         if querry != None:
+            if '"' in querry:
+                print("yes")
             resultado = consulta(findi, querry)
             mostrar(resultado, findi)
         else:
             while True:
+                termsnip = []
+                conparent = []
+                numparent = 0
                 text = input("Dime:")
                 if len(text) == 0:
                     break
                 querry = text
+                print(querry)
                 resultado = consulta(findi, querry)
                 mostrar(resultado, findi)
