@@ -49,7 +49,10 @@ def gensnippet(ar):
     ar = ar.replace("\t"," ")
     ar = ar.split()# Separamos el articulo en una lista de plabras
     for t in termsnip:# Para cada termino de la querry obtenermos su primer indice en el articulo
-        listindi.append(ar.index(t))
+        try:
+            listindi.append(ar.index(t))
+        except:
+            pass
     listindi.sort()
     for x in listindi:# Creamos el snippet obteniendo pedazos de texto de longitud 9 teniendo los terminos en el medio
         inn = max((x-4),0)# Evitamos salirnos del array
@@ -314,8 +317,7 @@ def mostrar(r, ind):
         if m[3]:
             p = p + arti["article"] + " "
         if m[4]:
-            p = p
-            #p = p + gensnippet(arti["article"]) + " "
+            p = p + gensnippet(arti["article"]) + " "
         print(p)
         c = c+1
     print("Numero de resultados: ", len(r))
