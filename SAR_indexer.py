@@ -80,13 +80,22 @@ def indexer(folder,fitxerGuardat):
                 for simb in text: #para cada temino en el texto
                     postingListTerms[simb] = postingListTerms.get(simb,[])# recuperas el termino
                     if postingListTerms[simb] == [] : # si recuperas nada
-                        postingListTerms[simb] = [len(dArticles)-1]
+                        postingListTerms[simb] = [1,[len(dArticles)-1]]
                     else :
-                        var = len(postingListTerms[simb])
-                        lista = postingListTerms[simb]
+                        tupla1 = postingListTerms[simb]
+                        var = len(tupla1[1])
+                        lista = tupla1[1]
                         if len(dArticles)-1 > lista[var-1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
-                            postingListTerms[simb] = postingListTerms.get(simb) + [len(dArticles)-1]
-
+                            auxlist = postingListTerms.get(simb)[1]
+                            auxnum = postingListTerms.get(simb)[0]
+                            auxlist = auxlist + [len(dArticles)-1]
+                            auxnum = auxnum +1
+                            postingListTerms[simb] = [auxnum,auxlist]
+                        else:
+                            auxnum = postingListTerms.get(simb)[0]
+                            auxnum = auxnum +1
+                            auxlist = postingListTerms.get(simb)[1]
+                            postingListTerms[simb] = [auxnum,auxlist]
 
                 for simb in title: #para cada temino en el texto
                     postingListTitle[simb] = postingListTitle.get(simb,[])# recuperas el termino
