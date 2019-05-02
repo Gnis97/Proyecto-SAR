@@ -29,6 +29,10 @@ def indexer(folder,fitxerGuardat):
     postingListSummary = {} # Diccionario inverso de las palabras del sumario
     postingListKeywords = {} # Diccionario inverso de palabras clave
     postingListDate = {} # Diccionario inverso de fechas
+    
+    permutemDic = {} #Diccionari de index permutem per paraula.
+    
+    
     for dirname, subdirs, files in os.walk(folder): #"paseja" per la carpeta
         for filename in files: #agafa els fitxers
             wholeName = os.path.join(dirname,filename)
@@ -135,6 +139,26 @@ def indexer(folder,fitxerGuardat):
     save_object(objecte, fitxerGuardat)
 
     print(postingListDate)
+
+    for term in postingListTerms:
+                #per a cada terme existent crea les diferents posibilitats de permutem i guarda en el diccionari.
+                permutemDic[term] = [len(permutemDic)]
+                index = 0 #per a la posició de les paraules
+                cont = 0
+                longitud = len(term) #numero de lletres de la paraula
+                numComb = longitud -1 #numero de combinacions segons el numero de lletres de cada paraula
+                comb = [term] #llistat de combinacions a inserir en el index permutem
+                for l in term  #este bucle hi ha que canviarlo no sé encara com possar-ho
+                    if cont != numComb:
+                        index = index +1
+                        nova = term[index : longitud] + term[0 : index]
+                        comb.append(nova)
+                        cont = cont + 1
+
+                permutemDic[term] = comb
+
+
+
 
 
 
