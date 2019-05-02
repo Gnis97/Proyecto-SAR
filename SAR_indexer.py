@@ -80,22 +80,19 @@ def indexer(folder,fitxerGuardat):
                 for simb in text: #para cada temino en el texto
                     postingListTerms[simb] = postingListTerms.get(simb,[])# recuperas el termino
                     if postingListTerms[simb] == [] : # si recuperas nada
-                        postingListTerms[simb] = [1,[len(dArticles)-1]]
+                        postingListTerms[simb] = [(1,len(dArticles)-1)]
                     else :
-                        tupla1 = postingListTerms[simb]
-                        var = len(tupla1[1])
-                        lista = tupla1[1]
-                        if len(dArticles)-1 > lista[var-1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
-                            auxlist = postingListTerms.get(simb)[1]
-                            auxnum = postingListTerms.get(simb)[0]
-                            auxlist = auxlist + [len(dArticles)-1]
-                            auxnum = auxnum +1
-                            postingListTerms[simb] = [auxnum,auxlist]
+                        listaTuplas = postingListTerms[simb]
+                        posUT = len(listaTuplas)-1
+                        ultimaTup = listaTuplas[posUT]
+                        if len(dArticles)-1 > ultimaTup[1]: #si el article que estem procesant es major que el ultim inserit vol dir que no esta
+                            tup = [(1,len(dArticles)-1)]
+                            postingListTerms[simb] += [(1,len(dArticles)-1)]
                         else:
-                            auxnum = postingListTerms.get(simb)[0]
-                            auxnum = auxnum +1
-                            auxlist = postingListTerms.get(simb)[1]
-                            postingListTerms[simb] = [auxnum,auxlist]
+                            nveces = ultimaTup[0]
+                            doc = ultimaTup[1]
+                            save = listaTuplas(posUT -1)
+                            postingListTerms[simb] = save + [(nveces +1, doc)]
 
                 for simb in title: #para cada temino en el texto
                     postingListTitle[simb] = postingListTitle.get(simb,[])# recuperas el termino
