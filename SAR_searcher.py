@@ -229,6 +229,30 @@ def consulta(ind, q):
                 operador = -1
     return res
 
+def get_term_from_permuterm(que,findi):
+    dicPerm = findi[-1] #diccionario permuterm
+    keys = dicPerm.keys() #recuperas las claves
+    i = 0 # variable del bucle
+    trobat = False # no trobat
+    res = "" #cadena de paraules que compleixen la query ex casa cosa amb query c*a
+    ##########traduim la query##########
+    while i < len(que) or !trobat: # busques el *
+        if que[i] == "*": # si l'has trobat
+            trobat = True # ho indiques
+            if i+1 != len(que): # i si no es la ultima pos fas aso
+                aux = que[i+1:len(que)-1] + "$" + que[0: i-1]
+            else: # si es la ultima pos fas alló
+                aux =  "$" + que[0: i-1]
+        i+=1 # lo de no fer un bucle infinit
+
+    for k in keys: # per a cada clau dins del diccionari
+        if k.startswith(aux): # si dita clau comensa per la query traduida
+            if len(res) == 0: # si es la primera que afegixes no te or
+                res +=aux
+            else: # si no es la primera si.
+                res += " or " + aux
+    return res 
+
 def intersection(p1,p2):
     res = []
     i = 0
