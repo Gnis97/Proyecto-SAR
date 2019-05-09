@@ -229,8 +229,12 @@ def consulta(ind, q):
                 operador = -1
     return res
 
-def get_term_from_permuterm(que,findi):
-    dicPerm = findi[-1] #diccionario permuterm de articulos
+def get_term_from_permuterm(que,findi,where_to_search):
+    if where_to_search == 2: pos_dict = -1 #diccionario de articles
+    if where_to_search == 5: pos_dict = -2 #diccionario keywords
+    if where_to_search == 3: pos_dict = -3 #diccionario de tituls
+    if where_to_search == 6: pos_dict = -4 # diccionario de dates
+    dicPerm = findi[pos_dict] #diccionario permuterm de articulos
     keys = dicPerm.keys() #recuperas las claves
     i = 0 # variable del bucle
     trobat = False # no trobat
