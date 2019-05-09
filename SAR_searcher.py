@@ -230,7 +230,7 @@ def consulta(ind, q):
     return res
 
 def get_term_from_permuterm(que,findi):
-    dicPerm = findi[-1] #diccionario permuterm
+    dicPerm = findi[-1] #diccionario permuterm de articulos
     keys = dicPerm.keys() #recuperas las claves
     i = 0 # variable del bucle
     trobat = False # no trobat
@@ -251,7 +251,7 @@ def get_term_from_permuterm(que,findi):
                 res +=aux
             else: # si no es la primera si.
                 res += " or " + aux
-    return res 
+    return res
 
 def intersection(p1,p2):
     res = []
