@@ -1,4 +1,4 @@
-    
+
 #!/usr/bin/env python
 #! -*- encoding: utf8 -*-
 
@@ -32,7 +32,7 @@ def indexer(folder,fitxerGuardat):
     postingListDate = {} # Diccionario inverso de fechas
 
     permutemDic = {} #Diccionari de index permutem per paraula.
-    
+
     for dirname, subdirs, files in os.walk(folder): #"paseja" per la carpeta
         for filename in files: #agafa els fitxers
             wholeName = os.path.join(dirname,filename)
@@ -140,16 +140,51 @@ def indexer(folder,fitxerGuardat):
                 longitud = len(term) #numero de lletres de la paraula
                 numComb = longitud -1 #numero de combinacions segons el numero de lletres de cada paraula
                 comb = [term] #llistat de combinacions a inserir en el index permutem
-                for l in term  #este bucle hi ha que canviarlo no sé encara com possar-ho
+                for l in term:  #este bucle hi ha que canviarlo no sé encara com possar-ho
                     if cont != numComb:
                         index = index +1
                         nova = term[index : longitud] + "$" + term[0 : index]
-                        permutemDic[nova] = term
+                        permutemDicArticle[nova] = term
                         cont = cont + 1
 
+            for word in postingListTitle:
+                index = 0
+                cont = 0
+                longitud = len(word)
+                numComb = longitud -1
+                comb = [word]
+                for l in word:
+                    if cont != numComb:
+                        index = index +1
+                        nova = word[index:longitud] + "$" + word[0:index]
+                        permutemDicTitle[nova] = word
+                        cont = cont+1
 
+            for word in postingListKeywords:
+                index = 0
+                cont = 0
+                longitud = len(word)
+                numComb = longitud -1
+                comb = [word]
+                for l in word:
+                    if cont != numComb:
+                        index = index +1
+                        nova = word[index:longitud] + "$" + word[0:index]
+                        permutemDicKeywords[nova] = word
+                        cont = cont+1
 
-
+            for word in postingListDate:
+                index = 0
+                cont = 0
+                longitud = len(word)
+                numComb = longitud -1
+                comb = [word]
+                for l in word:
+                    if cont != numComb:
+                        index = index +1
+                        nova = word[index:longitud] + "$" + word[0:index]
+                        permutemDicDate[nova] = word
+                        cont = cont+1
 
 
 
@@ -157,7 +192,7 @@ def indexer(folder,fitxerGuardat):
 
 
         #creación del objeto y guardado del mismo.
-    objecte = [dDocs, dArticles, postingListTerms, postingListTitle, postingListSummary,postingListKeywords,postingListDate, permutemDic]
+    objecte = [dDocs, dArticles, postingListTerms, postingListTitle, postingListSummary, postingListKeywords, postingListDate, permutemDicDate,permutemDicTitle,permutemDicKeywords,permutemDicArticle]
     save_object(objecte, fitxerGuardat)
 
     print(postingListDate)
