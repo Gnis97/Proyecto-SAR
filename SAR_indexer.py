@@ -29,6 +29,12 @@ def indexer(folder,fitxerGuardat):
     postingListSummary = {} # Diccionario inverso de las palabras del sumario
     postingListKeywords = {} # Diccionario inverso de palabras clave
     postingListDate = {} # Diccionario inverso de fechas
+
+    permutemDicArticle = {} #Diccionari de index permutem per paraula.
+    permutemDicDate = {}
+    permutemDicTitle = {}
+    permutemDicKeywords = {}
+
     for dirname, subdirs, files in os.walk(folder): #"paseja" per la carpeta
         for filename in files: #agafa els fitxers
             wholeName = os.path.join(dirname,filename)
@@ -130,11 +136,68 @@ def indexer(folder,fitxerGuardat):
                         postingListDate[date] = postingListDate.get(date) + [len(dArticles)-1]
 
 
-        #creación del objeto y grardado del mismo.
-    objecte = [dDocs, dArticles, postingListTerms, postingListTitle, postingListSummary,postingListKeywords,postingListDate]
+            for term in postingListTerms:
+                index = 0 #per a la posició de les paraules
+                cont = 0
+                longitud = len(term) #numero de lletres de la paraula
+                numComb = longitud -1 #numero de combinacions segons el numero de lletres de cada paraula
+                comb = [term] #llistat de combinacions a inserir en el index permutem
+                for l in term:  #este bucle hi ha que canviarlo no sé encara com possar-ho
+                    if cont != numComb:
+                        index = index +1
+                        nova = term[index : longitud] + "$" + term[0 : index]
+                        permutemDicArticle[nova] = term
+                        cont = cont + 1
+
+            for word in postingListTitle:
+                index = 0
+                cont = 0
+                longitud = len(word)
+                numComb = longitud -1
+                comb = [word]
+                for l in word:
+                    if cont != numComb:
+                        index = index +1
+                        nova = word[index:longitud] + "$" + word[0:index]
+                        permutemDicTitle[nova] = word
+                        cont = cont+1
+
+            for word in postingListKeywords:
+                index = 0
+                cont = 0
+                longitud = len(word)
+                numComb = longitud -1
+                comb = [word]
+                for l in word:
+                    if cont != numComb:
+                        index = index +1
+                        nova = word[index:longitud] + "$" + word[0:index]
+                        permutemDicKeywords[nova] = word
+                        cont = cont+1
+
+            for word in postingListDate:
+                index = 0
+                cont = 0
+                longitud = len(word)
+                numComb = longitud -1
+                comb = [word]
+                for l in word:
+                    if cont != numComb:
+                        index = index +1
+                        nova = word[index:longitud] + "$" + word[0:index]
+                        permutemDicDate[nova] = word
+                        cont = cont+1
+
+
+
+
+
+
+        #creación del objeto y guardado del mismo.
+    objecte = [dDocs, dArticles, postingListTerms, postingListTitle, postingListSummary, postingListKeywords, postingListDate, permutemDicDate,permutemDicTitle,permutemDicKeywords,permutemDicArticle]
     save_object(objecte, fitxerGuardat)
 
-    print(postingListDate)
+    print(permutemDicArticle)
 
 
 

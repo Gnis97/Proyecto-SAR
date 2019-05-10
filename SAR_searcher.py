@@ -66,6 +66,7 @@ def parsequerry(que):#Pasamos a minuscula y semaparamos la querry
     auxque = []
     inn = -1
     cun = 0
+    #cosas para los "
     for e in que:
         if '"' in e:
             if inn == -1:
@@ -98,10 +99,13 @@ def parentesis(quensulta):
     quensulta = quensulta.replace(quensulta[primer:ulti+1], cambio)
     return quensulta, 0
 
-def posicional(ttt):
+def posicional(ttt,lugbuss):
+    precosas = ["","","article","title","summary","keywords","date"]
     ttt = ttt.replace('"', "")
-    ttta = ttt.replace(" ", " and ")
+    ttta = precosas[lugbuss] + ":" + ttt
+    ttta = ttta.replace(" ", " and " + precosas[lugbuss] + ":")
     rrr = consulta(findi, ttta)
+    print("He encontrado: " + str(len(rrr)) + " buscando en " + precosas[lugbuss])
     k = len(rrr)
     dicDoc = findi[0]
     dicArt = findi[1]
@@ -112,7 +116,7 @@ def posicional(ttt):
         with open(dicDoc[ndoc]) as json_file:
             ob = json.load(json_file)
         arti = ob[posdoc]
-        if ttt in arti["article"]:
+        if ttt in arti[precosas[lugbuss]].lower():
             resulteido.append(rrr[c])
         c += 1
     return resulteido
@@ -151,7 +155,9 @@ def consulta(ind, q):
             if "rexultadio" in t:
                 aux = conparent[int(t.replace("rexultadio",""))]
             elif '"' in t:
-                aux = posicional(t)
+                aux = posicional(t,lugbus)
+            elif '*' in t or '?' in t:
+                aux = consulta(findi,get_term_from_permuterm(t,findi,lugbus))
             else:
                 aux = ind[lugbus].get(t,[]) #************************************************
             if aux is not []:
@@ -180,7 +186,9 @@ def consulta(ind, q):
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
-                        aux = posicional(t)
+                        aux = posicional(t,lugbus)
+                    elif '*' in t or '?' in t:
+                        aux = consulta(findi,get_term_from_permuterm(t,findi,lugbus))
                     else:
                         aux = ind[lugbus].get(t,[]) #*******************************************************************
                     if aux is not []:
@@ -191,7 +199,9 @@ def consulta(ind, q):
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
-                        aux = posicional(t)
+                        aux = posicional(t,lugbus)
+                    elif '*' in t or '?' in t:
+                        aux = consulta(findi,get_term_from_permuterm(t,findi,lugbus))
                     else:
                         aux = ind[lugbus].get(t,[]) #********************************************************************
                     if aux is not []:
@@ -202,7 +212,9 @@ def consulta(ind, q):
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
-                        aux = posicional(t)
+                        aux = posicional(t,lugbus)
+                    elif '*' in t or '?' in t:
+                        aux = consulta(findi,get_term_from_permuterm(t,findi,lugbus))
                     else:
                         aux = ind[lugbus].get(t,[]) #*********************************************************************
                     res = diferencia(inda, aux)
@@ -211,7 +223,9 @@ def consulta(ind, q):
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
-                        aux = posicional(t)
+                        aux = posicional(t,lugbus)
+                    elif '*' in t or '?' in t:
+                        aux = consulta(findi,get_term_from_permuterm(t,findi,lugbus))
                     else:
                         aux = ind[lugbus].get(t,[]) #*********************************************************************
                     aux = diferencia(inda, aux)
@@ -221,7 +235,9 @@ def consulta(ind, q):
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
-                        aux = posicional(t)
+                        aux = posicional(t,lugbus)
+                    elif '*' in t or '?' in t:
+                        aux = consulta(findi,get_term_from_permuterm(t,findi,lugbus))
                     else:
                         aux = ind[lugbus].get(t,[]) #**********************************************************************
                     aux = diferencia(inda, aux)
@@ -230,31 +246,47 @@ def consulta(ind, q):
     return res
 
 def get_term_from_permuterm(que,findi,where_to_search):
-    if where_to_search == 2: pos_dict = -1 #diccionario de articles
-    if where_to_search == 5: pos_dict = -2 #diccionario keywords
-    if where_to_search == 3: pos_dict = -3 #diccionario de tituls
-    if where_to_search == 6: pos_dict = -4 # diccionario de dates
+    donde = ""
+    astointe = -1
+    longi = len(que)
+    if where_to_search == 2:
+        pos_dict = -1 #diccionario de articles
+        donde = "article:"
+    elif where_to_search == 5:
+        pos_dict = -2 #diccionario keywords
+        donde = "keywords:"
+    elif where_to_search == 3:
+        pos_dict = -3 #diccionario de tituls
+        donde = "title:"
+    elif where_to_search == 6:
+        pos_dict = -4 # diccionario de dates
+        donde = "dates:"
+
     dicPerm = findi[pos_dict] #diccionario permuterm de articulos
     keys = dicPerm.keys() #recuperas las claves
-    i = 0 # variable del bucle
-    trobat = False # no trobat
     res = "" #cadena de paraules que compleixen la query ex casa cosa amb query c*a
     ##########traduim la query##########
-    while i < len(que) or !trobat: # busques el *
-        if que[i] == "*": # si l'has trobat
-            trobat = True # ho indiques
-            if i+1 != len(que): # i si no es la ultima pos fas aso
-                aux = que[i+1:len(que)-1] + "$" + que[0: i-1]
-            else: # si es la ultima pos fas alló
-                aux =  "$" + que[0: i-1]
-        i+=1 # lo de no fer un bucle infinit
+    if '*' in que:
+        indirisco = que.index("*")
+        astointe = 0
+    else:
+        indirisco = que.index("?")
+        astointe = 1
+    aux = que + "$"
+    aux = aux[indirisco+1:len(aux)] + aux[0:indirisco]
 
     for k in keys: # per a cada clau dins del diccionari
         if k.startswith(aux): # si dita clau comensa per la query traduida
             if len(res) == 0: # si es la primera que afegixes no te or
-                res +=aux
+                if astointe == 1 and len(dicPerm[k]) == longi:
+                    res += donde + dicPerm[k]
+                elif astointe == 0:
+                    res += donde + dicPerm[k]
             else: # si no es la primera si.
-                res += " or " + aux
+                if astointe == 1 and len(dicPerm[k]) == longi:
+                    res += " or " + donde + dicPerm[k]
+                elif astointe == 0:
+                    res += " or " + donde + dicPerm[k]
     return res
 
 def intersection(p1,p2):
