@@ -142,6 +142,10 @@ def indexer(folder,fitxerGuardat):
                 longitud = len(term) #numero de lletres de la paraula
                 numComb = longitud -1 #numero de combinacions segons el numero de lletres de cada paraula
                 comb = [term] #llistat de combinacions a inserir en el index permutem
+                nova = term + "$" #creem l'ultim permuterm
+                permutemDicSummary[nova] = term #l'afegim al diccionari
+                nova = "$" + term #creem el primer permuterm
+                permutemDicSummary[nova] = term #l'afegim al diccionari
                 for l in term:  #este bucle hi ha que canviarlo no sé encara com possar-ho
                     if cont != numComb:
                         index = index +1
@@ -155,6 +159,10 @@ def indexer(folder,fitxerGuardat):
                 longitud = len(word)
                 numComb = longitud -1
                 comb = [word]
+                nova = word + "$"
+                permutemDicSummary[nova] = word
+                nova = "$" + word
+                permutemDicSummary[nova] = word
                 for l in word:
                     if cont != numComb:
                         index = index +1
@@ -168,6 +176,10 @@ def indexer(folder,fitxerGuardat):
                 longitud = len(word)
                 numComb = longitud -1
                 comb = [word]
+                nova = word + "$"
+                permutemDicSummary[nova] = word
+                nova = "$" + word
+                permutemDicSummary[nova] = word
                 for l in word:
                     if cont != numComb:
                         index = index +1
@@ -181,6 +193,10 @@ def indexer(folder,fitxerGuardat):
                 longitud = len(word)
                 numComb = longitud -1
                 comb = [word]
+                nova = word + "$"
+                permutemDicSummary[nova] = word
+                nova = "$" + word
+                permutemDicSummary[nova] = word
                 for l in word:
                     if cont != numComb:
                         index = index +1
@@ -188,13 +204,28 @@ def indexer(folder,fitxerGuardat):
                         permutemDicDate[nova] = word
                         cont = cont+1
 
-
+            for word in postingListSummary:
+                index = 0
+                cont = 0
+                longitud = len(word)
+                numComb = longitud -1
+                comb = [word]
+                nova = word + "$"
+                permutemDicSummary[nova] = word
+                nova = "$" + word
+                permutemDicSummary[nova] = word
+                for l in word:
+                    if cont != numComb:
+                        index = index +1
+                        nova = word[index:longitud] + "$" + word[0:index]
+                        permutemDicSummary[nova] = word
+                        cont = cont+1
 
 
 
 
         #creación del objeto y guardado del mismo.
-    objecte = [dDocs, dArticles, postingListTerms, postingListTitle, postingListSummary, postingListKeywords, postingListDate, permutemDicDate,permutemDicTitle,permutemDicKeywords,permutemDicArticle]
+    objecte = [dDocs, dArticles, postingListTerms, postingListTitle, postingListSummary, postingListKeywords, postingListDate, permutemDicSummary,permutemDicDate,permutemDicTitle,permutemDicKeywords,permutemDicArticle]
     save_object(objecte, fitxerGuardat)
 
     print(permutemDicArticle)
