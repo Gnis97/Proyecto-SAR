@@ -291,6 +291,9 @@ def get_term_from_permuterm(que,findi,where_to_search):
     elif where_to_search == 6:
         pos_dict = -4 # diccionario de dates
         donde = "dates:"
+    elif where_to_search == 4:
+            pos_dict = -5 # diccionario de dates
+            donde = "summary:"
 
     dicPerm = findi[pos_dict] #diccionario permuterm de articulos
     keys = dicPerm.keys() #recuperas las claves
