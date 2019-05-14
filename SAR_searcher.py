@@ -2,19 +2,12 @@
 #! -*- encoding: utf8 -*-
 
 """
-
-Requesitos:
-
-    2 argumentos: 1º indicie (2º querry)
-    PREPARADO Si solo hay un argumento bucle.
-    PREPARADO Operdores and or not izquierda a aderecha
-    PREPARADO Salida  para 1-2 resltados fecha titulo keywords y cuerpo
-    PREPARADO 3-5 fecha titular keywords y snippet(tienen que estar la querry)
-    PREPARADO +5 fecha titular keywords de las 10 priemeras y un noticia por liena
-    Siempre se mostrara en nombre del fichero que contiene la noticia y numero
-    PREPARADO total de notiias.
-
+Martinez Sanchis, Genis
+Garcia Bohigues, Miguel
+Piqueres Matoses, Pilar
+Giner Vidal, Angel
 """
+
 import re
 import sys
 import json
@@ -170,11 +163,11 @@ def consulta(ind, q):
     inda = ind[1]
     q = parsequerry(q)
     for t in q:# Recorrremos la querry
-        print("TERMINO: ", t)
+        #print("TERMINO: ", t)
         t,lugbus = procesarTermino(t) # te devuelve el termino limpio y el diccionario en el que tienes que bucar
 
         if len(res) == 0 and not t == "not" and not t == "and" and not t == "or" and operador == -1:
-            print("PRIMER TERMINO")
+            #print("PRIMER TERMINO")
             if "rexultadio" in t:
                 aux = conparent[int(t.replace("rexultadio",""))]
             elif '"' in t:
@@ -190,22 +183,22 @@ def consulta(ind, q):
         else:
             if(t == "and" or t == "or" or t == "not"):
                 if t == "and": #es una and
-                    print("HE ENCONTRADO UN AND")
+                    #print("HE ENCONTRADO UN AND")
                     operador = 1
                 if t == "or":
-                    print("HE ENCONTRADO UN OR")
+                    #print("HE ENCONTRADO UN OR")
                     operador = 2
                 if t == "not":
-                    print("HE ENCONTRADO UN NOT")
+                    #print("HE ENCONTRADO UN NOT")
                     if operador > 0:
-                        print("NOT DOBLE")
+                        #print("NOT DOBLE")
                         operador = operador*10
                     else:
-                        print("NOT SIMPLE")
+                        #print("NOT SIMPLE")
                         operador = 3
             else:
                 if operador == 1:
-                    print("HE APLICADO UN AND")
+                    #print("HE APLICADO UN AND")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
@@ -218,7 +211,7 @@ def consulta(ind, q):
                         termsnip.append(t)
                     res = intersection(res, aux)
                 if operador == 2:
-                    print("HE APLICADO UN OR")
+                    #print("HE APLICADO UN OR")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
@@ -231,7 +224,7 @@ def consulta(ind, q):
                         termsnip.append(t)
                     res = union(res, aux)
                 if operador == 3:
-                    print("HE APLICADO UN NOT")
+                    #print("HE APLICADO UN NOT")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
@@ -242,7 +235,7 @@ def consulta(ind, q):
                         aux = ind[lugbus].get(t,[]) #*********************************************************************
                     res = diferencia(inda, aux)
                 if operador == 10:
-                    print("HE APLICADO UN AND NOT")
+                    #print("HE APLICADO UN AND NOT")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
@@ -254,7 +247,7 @@ def consulta(ind, q):
                     aux = diferencia(inda, aux)
                     res = intersection(res, aux)
                 if operador == 20:
-                    print("HE APLICADO UN OR NOT")
+                    #print("HE APLICADO UN OR NOT")
                     if "rexultadio" in t:
                         aux = conparent[int(t.replace("rexultadio",""))]
                     elif '"' in t:
@@ -292,8 +285,8 @@ def get_term_from_permuterm(que,findi,where_to_search):
         pos_dict = -4 # diccionario de dates
         donde = "dates:"
     elif where_to_search == 4:
-            pos_dict = -5 # diccionario de dates
-            donde = "summary:"
+        pos_dict = -5 # diccionario de dates
+        donde = "summary:"
 
     dicPerm = findi[pos_dict] #diccionario permuterm de articulos
     keys = dicPerm.keys() #recuperas las claves
@@ -397,26 +390,31 @@ def mostrar(r, ind):
         k = min(len(r), 10) # com maximo mostramos 10
         m = (1,1,1,0,0)
     c = 0
-    print("Numero de resultados: ", len(r))
+    fgh = ""
     while c < k: # para cada artiulo imprimimos loq eue tenemos indicado en m
         ndoc,posdoc = dicArt[r[c]]
         with open(dicDoc[ndoc]) as json_file:
             ob = json.load(json_file)
         arti = ob[posdoc]
+        fgh = fgh + dicDoc[ndoc] + "\n"
         p = ""
         if m[0]:
             p = p + arti["date"] + " "
         if m[1]:
             p = p + arti["title"] + " "
         if m[2]:
-            p = p + arti["keywords"] + " "
+            p = p + "[" + arti["keywords"] + "]" + " "
         if m[3]:
             p = p + arti["article"] + " "
         if m[4]:
             p = p + gensnippet(arti["article"]) + " "
-        print(p)
+        print(p, "\n")
         c = c+1
-    print("Numero de resultados: ", len(r))
+    print("Numero de resultados: ", len(r), "\n")
+
+    print("Rutas de los resultados:", "\n")
+
+    print(fgh)
 
 if __name__ == "__main__":
     querry = None
@@ -440,6 +438,6 @@ if __name__ == "__main__":
                 if len(text) == 0:
                     break
                 querry = text
-                print(querry)
+                #print(querry)
                 resultado = consulta(findi, querry)
                 mostrar(resultado, findi)
